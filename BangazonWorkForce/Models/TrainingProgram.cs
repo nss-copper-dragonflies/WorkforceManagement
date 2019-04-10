@@ -7,7 +7,7 @@ namespace BangazonWorkForce.Models
 {
     public class TrainingProgram
     {
-        public int id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public DateTime StartDate { get; set; } = new DateTime();
         public DateTime EndDate { get; set; } = new DateTime();

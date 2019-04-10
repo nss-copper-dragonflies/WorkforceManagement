@@ -68,7 +68,7 @@ insert into  ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate)
 
 insert into TrainingProgram ([Name], StartDate, EndDate, MaxAttendees) values ('How to Count Beans', '14 Feb 2019', '15 Feb 2019', 10)
 insert into TrainingProgram ([Name], StartDate, EndDate, MaxAttendees) values ('How to Spell "IT"', '14 Feb 2019', '15 Feb 2019', 10)
-insert into TrainingProgram ([Name], StartDate, EndDate, MaxAttendees) values ('How to Sell Beans', '14 Feb 2019', '15 Feb 2019', 10)
+insert into TrainingProgram ([Name], StartDate, EndDate, MaxAttendees) values ('How to Sell Beans', '14 Feb 2021', '15 Feb 2021', 10)
 insert into TrainingProgram ([Name], StartDate, EndDate, MaxAttendees) values ('How to Sell Cars', '14 Feb 2020', '15 Feb 2020', 12)
 
 insert into EmployeeTraining (EmployeeId, TrainingProgramId) values (1, 1)
