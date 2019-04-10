@@ -10,6 +10,7 @@ Bangazon Workforce Management enables HR to manage employees, departments and tr
 ### Departments
 
 ### Training Programs
+The user has the ability to view all future training programs and create new training programs and assign their start date, end date, and maximum number of attendees.
 
 
 ## IT
