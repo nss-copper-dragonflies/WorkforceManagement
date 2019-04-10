@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonWorkForce.Models;
+using BangazonWorkForce.Models.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -27,7 +28,7 @@ namespace BangazonWorkForce.Controllers
             }
         }
 
-        // GET Future Training Programs
+        // GET All Future Training Programs
         public ActionResult Index()
         {
             using (SqlConnection conn = Connection)
@@ -63,10 +64,27 @@ namespace BangazonWorkForce.Controllers
             }
         }
 
-        // GET: TrainingProgram/Details/5
-        public ActionResult Details(int id)
+        // Get individual training program details with a list of employees attending the training program
+        public ActionResult Details(TrainingProgramDetailsViewModel ViewModel)
         {
-            return View();
+           
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"SELECT Name, StartDate,
+                                            EndDate, MaxAttendees
+
+                                            FROM TrainingProgram
+
+                                            WHERE Id = @Id";
+                        cmd.Parameters.Add(new SqlParameter("@Id", ViewModel.TrainingProgram.Id));
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                    return RedirectToAction(nameof(Index));
+                    }
+                }
         }
 
         // GET: TrainingProgram/Create
