@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonWorkForce.Models;
+using BangazonWorkForce.Models.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -72,42 +73,51 @@ namespace BangazonWorkForce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"select e.Id, d.Id as dId, e.FirstName, e.LastName, d.[Name], c.Make, c.Manufacturer, tp.[Name] as tpName
+                    cmd.CommandText = @"select et.EmployeeId as etId, ec.EmployeeId as ecId, e.Id, d.Id as dId, e.FirstName, e.LastName, d.[Name], c.Make, c.Manufacturer, tp.[Name] as tpName
                                         from Employee e
-                                        join department d on e.DepartmentId = d.Id
-                                        join ComputerEmployee ec on  ec.EmployeeId = e.Id
-                                        join Computer c on ec.ComputerId = c.Id
-                                        join EmployeeTraining et on et.EmployeeId = e.Id
-                                        join TrainingProgram tp on et.TrainingProgramId = tp.Id
+                                        left join department d on e.DepartmentId = d.Id
+                                        left join ComputerEmployee ec on  ec.EmployeeId = e.Id
+                                        left join Computer c on ec.ComputerId = c.Id
+                                        left join EmployeeTraining et on et.EmployeeId = e.Id
+                                        left join TrainingProgram tp on et.TrainingProgramId = tp.Id
                                         where e.Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     Employee employee = null;
 
-                    if (reader.Read())
+                    while (reader.Read())
                     {
+
                         employee = new Employee
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("dId")),
+                            TrainingProgramList = new List<TrainingProgram>(),
+                            Computer = new Computer(),
                             Department = new Department
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("dId")),
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
                             },
-                            TrainingProgram = new TrainingProgram
-                            {
-                                Name = reader.GetString(reader.GetOrdinal("tpName")),
-                            },
-                            Computer = new Computer
+                        };
+                        if (!reader.IsDBNull(reader.GetOrdinal("ecId")))
+                        {
+                            employee.Computer = new Computer
                             {
                                 Make = reader.GetString(reader.GetOrdinal("Make")),
                                 Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
-                            }
-                        };
+                            };
+                        }
+                        if (!reader.IsDBNull(reader.GetOrdinal("etId")))
+                        {
+                            employee.TrainingProgramList.Add(new TrainingProgram
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("Name"))
+                            });
+                        }                           
                     }
 
                     reader.Close();
@@ -116,27 +126,42 @@ namespace BangazonWorkForce.Controllers
                 }
             }
         }
-
-        // GET: Employee/Create
+       
         public ActionResult Create()
         {
-            return View();
+            EmployeeCreateViewModel viewModel =
+                new EmployeeCreateViewModel(_configuration.GetConnectionString("DefaultConnection"));
+            return View(viewModel);
         }
 
         // POST: Employee/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(EmployeeCreateViewModel viewModel)
         {
             try
             {
-                // TODO: Add insert logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"INSERT INTO Employee (firstname, lastname, IsSupervisor, departmentId)
+                                            VALUES (@firstname, @lastname, @IsSupervisor, @departmentId)";
+                        cmd.Parameters.Add(new SqlParameter("@firstname", viewModel.Employee.FirstName));
+                        cmd.Parameters.Add(new SqlParameter("@lastname", viewModel.Employee.LastName));
+                        cmd.Parameters.Add(new SqlParameter("@IsSupervisor", viewModel.Employee.IsSupervisor));
+                        cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.Employee.DepartmentId));
 
-                return RedirectToAction(nameof(Index));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
             }
             catch
             {
-                return View();
+                return View(viewModel);
             }
         }
 
@@ -187,3 +212,4 @@ namespace BangazonWorkForce.Controllers
         }
     }
 }
+

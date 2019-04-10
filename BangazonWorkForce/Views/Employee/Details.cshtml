@@ -47,11 +47,17 @@
             @Html.DisplayFor(model => model.Computer.Manufacturer)
         </dd>
         <dt class="col-sm-2">
-            TrainingProgram
+            TrainingPrograms
         </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TrainingProgram.Name)
-        </dd>
+        @if(Model.TrainingProgramList.Count > 0)
+        {
+            @foreach (var item in Model.TrainingProgramList)
+            {
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => item.Name)
+                </dd>       
+            }
+        }
     </dl>
 </div>
 <div>
