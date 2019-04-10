@@ -7,9 +7,11 @@ namespace BangazonWorkForce.Models
 {
     public class Department
     {
-        public int id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public int Budget { get; set; }
+        public int EmployeeCount { get; set; }
+        public Employee Employee { get; set; } = new Employee();
         public List<Employee> employeeList { get; set; } = new List<Employee>();
     }
 }
