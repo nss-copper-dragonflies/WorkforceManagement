@@ -34,26 +34,40 @@ namespace BangazonWorkForce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT d.Id, count(e.Id) as DepartmentSize, d.[name], d.Budget
-                                        FROM Department d join Employee e
-                                        ON e.DepartmentId = d.Id
-                                        group by d.Id, d.Name, d.Budget";
+                    cmd.CommandText = @"SELECT d.Id, d.[name], d.Budget, e.Id as employeeId, e.FirstName
+                                        FROM Department d left join Employee e
+                                        ON e.DepartmentId = d.Id";
                     SqlDataReader reader = cmd.ExecuteReader();
-                    List<Department> departmentList = new List<Department>();
+                    Dictionary<int, Department> departmentDictionary = new Dictionary<int, Department>();
                     while (reader.Read())
                     {
-                        Department department = new Department
+                        int deptId = reader.GetInt32(reader.GetOrdinal("Id"));
+                        if (!departmentDictionary.ContainsKey(deptId))
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("name")),
-                            Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
-                            EmployeeCount = reader.GetInt32(reader.GetOrdinal("DepartmentSize"))
-                        };
-                        departmentList.Add(department);
+                            Department department = new Department
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("name")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
+                            };
+                            departmentDictionary.Add(deptId, department);
+                        }
+                        if (!reader.IsDBNull(reader.GetOrdinal("employeeId")))
+                        {
+                            Department currentDepartment = departmentDictionary[deptId];
+                            currentDepartment.employeeList.Add(
+                            new Employee
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("employeeId")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName"))  
+                                
+                            });
+                        }
+                        
                     }
                     reader.Close();
-                    
-                    return View(departmentList);
+
+                    return View(departmentDictionary.Values.ToList());
                 }
             }
         }
@@ -84,20 +98,20 @@ namespace BangazonWorkForce.Controllers
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Name = reader.GetString(reader.GetOrdinal("name")),
                                 Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
-                                
+
                             };
 
                         }
-                            if (!reader.IsDBNull(reader.GetOrdinal("employeeId")))
-                            {
+                        if (!reader.IsDBNull(reader.GetOrdinal("employeeId")))
+                        {
                             int employeeId = reader.GetInt32(reader.GetOrdinal("employeeId"));
-                                if(!department.employeeList.Any(e => e.Id == employeeId))
+                            if (!department.employeeList.Any(e => e.Id == employeeId))
                                 department.employeeList.Add(new Employee
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("employeeId")),
                                     FirstName = reader.GetString(reader.GetOrdinal("FirstName"))
                                 });
-                            }
+                        }
                     }
                     reader.Close();
 
@@ -109,70 +123,38 @@ namespace BangazonWorkForce.Controllers
         // GET: Department/Create
         public ActionResult Create()
         {
-            return View();
+            return View();    
         }
 
         // POST: Department/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Department department)
         {
             try
             {
                 // TODO: Add insert logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"INSERT INTO Department (Name, Budget)
+                                            Values (@name, @budget)";
+                        cmd.Parameters.Add(new SqlParameter("@name", department.Name));
+                        cmd.Parameters.Add(new SqlParameter("@budget", department.Budget));
 
-                return RedirectToAction(nameof(Index));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
             }
             catch
             {
-                return View();
+                return View(department);
             }
         }
-
-        // GET: Department/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Department/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Department/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: Department/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-    }
+       
+    }   
 }
