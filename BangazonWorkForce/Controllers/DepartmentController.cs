@@ -48,7 +48,8 @@ namespace BangazonWorkForce.Controllers
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Name = reader.GetString(reader.GetOrdinal("name")),
-                                Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+
                             };
                             departmentDictionary.Add(deptId, department);
                         }
@@ -82,7 +83,7 @@ namespace BangazonWorkForce.Controllers
                 {
                     cmd.CommandText = @"SELECT d.Id, d.[name], d.Budget, e.Id as employeeId, e.FirstName
                                         FROM Department d 
-                                        join Employee e
+                                        left join Employee e
                                         ON e.DepartmentId = d.Id
                                         where d.id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -98,7 +99,7 @@ namespace BangazonWorkForce.Controllers
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Name = reader.GetString(reader.GetOrdinal("name")),
                                 Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
-
+                                
                             };
 
                         }
