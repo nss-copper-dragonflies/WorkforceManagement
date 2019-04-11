@@ -35,7 +35,7 @@ namespace BangazonWorkForce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT id, Make, Manufacturer
+                    cmd.CommandText = @"SELECT id, Make, Manufacturer, purchaseDate
                                         From Computer";
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -46,7 +46,8 @@ namespace BangazonWorkForce.Controllers
                         {
                             id = reader.GetInt32(reader.GetOrdinal("id")),
                             Make = reader.GetString(reader.GetOrdinal("Make")),
-                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
+                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                            purchaseDate = reader.GetDateTime(reader.GetOrdinal("purchaseDate"))
                         };
                         computerList.Add(computer);
                     }
@@ -59,7 +60,33 @@ namespace BangazonWorkForce.Controllers
         // GET: Computer/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"select id, Make, Manufacturer, PurchaseDate 
+                                        from computer
+                                        where Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Computer computer = null;
+
+                    if (reader.Read())
+                    {
+                        computer = new Computer
+                        {
+                            id = reader.GetInt32(reader.GetOrdinal("id")),
+                            Make = reader.GetString(reader.GetOrdinal("Make")),
+                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                            purchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
+                        };
+                    }
+                    reader.Close();
+                    return View(computer);
+                }
+            }
         }
 
         // GET: Computer/Create
