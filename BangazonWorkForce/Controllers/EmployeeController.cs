@@ -73,14 +73,16 @@ namespace BangazonWorkForce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"select et.EmployeeId as etId, ec.EmployeeId as ecId, e.Id, d.Id as dId, e.FirstName, e.LastName, d.[Name], c.Make, c.Manufacturer, tp.[Name] as tpName, tp.Id as tpId
-                                        from Employee e
-                                        left join department d on e.DepartmentId = d.Id
-                                        left join ComputerEmployee ec on  ec.EmployeeId = e.Id
-                                        left join Computer c on ec.ComputerId = c.Id
-                                        left join EmployeeTraining et on et.EmployeeId = e.Id
-                                        left join TrainingProgram tp on et.TrainingProgramId = tp.Id
-                                        where e.Id = @id";
+                    cmd.CommandText = @"select et.EmployeeId as etId, ec.EmployeeId as ecId, e.Id, d.Id as dId, e.FirstName, 
+                                                e.LastName, d.[Name], c.Make, c.Manufacturer, tp.[Name] as tpName, tp.Id as tpId,
+                                                tp.EndDate, tp.StartDate
+                                                from Employee e
+                                                left join department d on e.DepartmentId = d.Id
+                                                left join ComputerEmployee ec on  ec.EmployeeId = e.Id
+                                                left join Computer c on ec.ComputerId = c.Id
+                                                left join EmployeeTraining et on et.EmployeeId = e.Id
+                                                left join TrainingProgram tp on et.TrainingProgramId = tp.Id
+                                                where e.Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -127,7 +129,9 @@ namespace BangazonWorkForce.Controllers
                                 currentemployee.TrainingProgramList.Add(new TrainingProgram
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("tpId")),
-                                    Name = reader.GetString(reader.GetOrdinal("tpName"))
+                                    Name = reader.GetString(reader.GetOrdinal("tpName")),
+                                    StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                    EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate"))
                                 });
                             }
                         }                           

@@ -47,15 +47,51 @@
             @Html.DisplayFor(model => model.Computer.Manufacturer)
         </dd>
         <dt class="col-sm-2">
-            TrainingPrograms
+            Upcoming or Current TrainingPrograms
         </dt>
         @if (Model.TrainingProgramList.Count > 0)
         {
             @foreach (var item in Model.TrainingProgramList)
             {
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(model => item.Name)
-                </dd>
+                if (item.EndDate >= DateTime.Now)
+                {
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => item.Name)
+                    </dd>
+                    <dd class="col-sm-10">
+                        StartDate
+                        @Html.DisplayFor(model => item.StartDate)
+                    </dd>
+                    <dd class="col-sm-10">
+                        EndDate
+                        @Html.DisplayFor(model => item.EndDate)
+                    </dd>
+                }
+            }
+        }
+
+        <dt class="col-sm-2">
+            Completed TrainingPrograms
+        </dt>
+
+        @if (Model.TrainingProgramList.Count > 0)
+        {
+            @foreach (var item in Model.TrainingProgramList)
+            {
+                if (item.EndDate <= DateTime.Now)
+                {
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => item.Name)
+                    </dd>
+                    <dd class="col-sm-10">
+                        StartDate
+                        @Html.DisplayFor(model => item.StartDate)
+                    </dd>
+                    <dd class="col-sm-10">
+                        EndDate
+                        @Html.DisplayFor(model => item.EndDate)
+                    </dd>
+                }
             }
         }
     </dl>
