@@ -49,13 +49,13 @@
         <dt class="col-sm-2">
             TrainingPrograms
         </dt>
-        @if(Model.TrainingProgramList.Count > 0)
+        @if (Model.TrainingProgramList.Count > 0)
         {
             @foreach (var item in Model.TrainingProgramList)
             {
                 <dd class="col-sm-10">
                     @Html.DisplayFor(model => item.Name)
-                </dd>       
+                </dd>
             }
         }
     </dl>

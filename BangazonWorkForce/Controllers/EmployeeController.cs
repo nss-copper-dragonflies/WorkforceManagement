@@ -73,7 +73,7 @@ namespace BangazonWorkForce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"select et.EmployeeId as etId, ec.EmployeeId as ecId, e.Id, d.Id as dId, e.FirstName, e.LastName, d.[Name], c.Make, c.Manufacturer, tp.[Name] as tpName
+                    cmd.CommandText = @"select et.EmployeeId as etId, ec.EmployeeId as ecId, e.Id, d.Id as dId, e.FirstName, e.LastName, d.[Name], c.Make, c.Manufacturer, tp.[Name] as tpName, tp.Id as tpId
                                         from Employee e
                                         left join department d on e.DepartmentId = d.Id
                                         left join ComputerEmployee ec on  ec.EmployeeId = e.Id
@@ -84,28 +84,35 @@ namespace BangazonWorkForce.Controllers
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    Employee employee = null;
+                    Dictionary<int, Employee> employees = new Dictionary<int, Employee>();
 
                     while (reader.Read())
                     {
+                        int employeeid = reader.GetInt32(reader.GetOrdinal("Id"));
 
-                        employee = new Employee
+                        if (!employees.ContainsKey(employeeid))
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            DepartmentId = reader.GetInt32(reader.GetOrdinal("dId")),
-                            TrainingProgramList = new List<TrainingProgram>(),
-                            Computer = new Computer(),
-                            Department = new Department
+
+                            Employee employee = new Employee
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("dId")),
-                                Name = reader.GetString(reader.GetOrdinal("Name")),
-                            },
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                DepartmentId = reader.GetInt32(reader.GetOrdinal("dId")),
+                                TrainingProgramList = new List<TrainingProgram>(),
+                                Computer = new Computer(),
+                                Department = new Department
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("dId")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                },
+                            };
+                            employees.Add(employeeid, employee);
                         };
                         if (!reader.IsDBNull(reader.GetOrdinal("ecId")))
                         {
-                            employee.Computer = new Computer
+                            Employee currentemployee = employees[employeeid];
+                            currentemployee.Computer = new Computer
                             {
                                 Make = reader.GetString(reader.GetOrdinal("Make")),
                                 Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
@@ -113,16 +120,28 @@ namespace BangazonWorkForce.Controllers
                         }
                         if (!reader.IsDBNull(reader.GetOrdinal("etId")))
                         {
-                            employee.TrainingProgramList.Add(new TrainingProgram
+                            Employee currentemployee = employees[employeeid];
+
+                            if (!currentemployee.TrainingProgramList.Any(x => x.id == reader.GetInt32(reader.GetOrdinal("tpId"))))
                             {
-                                Name = reader.GetString(reader.GetOrdinal("Name"))
-                            });
+                                currentemployee.TrainingProgramList.Add(new TrainingProgram
+                                {
+                                    id = reader.GetInt32(reader.GetOrdinal("tpId")),
+                                    Name = reader.GetString(reader.GetOrdinal("tpName"))
+                                });
+                            }
                         }                           
                     }
 
                     reader.Close();
 
-                    return View(employee);
+                    List<Employee> employeeDetail = employees.Values.ToList();
+
+                    foreach(Employee e in employeeDetail)
+                    {
+                        return View(e);
+                    }
+                    return View();
                 }
             }
         }
@@ -166,10 +185,22 @@ namespace BangazonWorkForce.Controllers
         }
 
         // GET: Employee/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+        //public ActionResult Edit(int id)
+        //{
+        //    Employee employee = GetInstructorById(id);
+        //    if (instructor == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    InstructorEditViewModel viewModel = new InstructorEditViewModel
+        //    {
+        //        Cohorts = GetAllCohorts(),
+        //        Instructor = instructor
+        //    };
+
+        //    return View(viewModel);
+        //}
 
         // POST: Employee/Edit/5
         [HttpPost]
