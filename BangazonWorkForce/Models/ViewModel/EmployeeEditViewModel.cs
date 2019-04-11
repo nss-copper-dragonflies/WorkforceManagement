@@ -11,12 +11,16 @@ namespace BangazonWorkForce.Models.ViewModel
     {
         public EmployeeEditViewModel()
         {
+            Departments = new List<Department>();
             TrainingPrograms = new List<TrainingProgram>();
+            Computers = new List<Computer>();
         }
 
         public Employee Employee { get; set; }
         public TrainingProgram trainingProgram { get; set; }
+        public Computer computer { get; set; }
         public List<TrainingProgram> TrainingPrograms { get; set; }
+        public List<Computer> Computers { get; set; }
         public List<Department> Departments { get; set; }
 
         public EmployeeEditViewModel(string connectionString)
@@ -42,7 +46,45 @@ namespace BangazonWorkForce.Models.ViewModel
                     reader.Close();
                 }
             }
+            using (SqlConnection conn1 = new SqlConnection(connectionString))
+            {
+                conn1.Open();
+                using (SqlCommand cmd = conn1.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT id, Make from Computer;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Computers = new List<Computer>();
+
+                    while (reader.Read())
+                    {
+                        Computers.Add(new Computer
+                        {
+                            id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Make = reader.GetString(reader.GetOrdinal("Make"))
+                        });
+                    }
+                    reader.Close();
+                }
+            }
         }
+        public List<SelectListItem> ComputerOptions
+        {
+            get
+            {
+                if (Computers == null)
+                {
+                    return null;
+                }
+
+                return Computers.Select(d => new SelectListItem
+                {
+                    Value = d.id.ToString(),
+                    Text = d.Make
+                }).ToList();
+            }
+        }
+
 
         public List<SelectListItem> TrainingProgramOptions
         {

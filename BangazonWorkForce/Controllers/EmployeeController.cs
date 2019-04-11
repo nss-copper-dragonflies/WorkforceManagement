@@ -134,14 +134,14 @@ namespace BangazonWorkForce.Controllers
                                     EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate"))
                                 });
                             }
-                        }                           
+                        }
                     }
 
                     reader.Close();
 
                     List<Employee> employeeDetail = employees.Values.ToList();
 
-                    foreach(Employee e in employeeDetail)
+                    foreach (Employee e in employeeDetail)
                     {
                         return View(e);
                     }
@@ -149,7 +149,7 @@ namespace BangazonWorkForce.Controllers
                 }
             }
         }
-       
+
         public ActionResult Create()
         {
             EmployeeCreateViewModel viewModel =
@@ -192,16 +192,18 @@ namespace BangazonWorkForce.Controllers
         public ActionResult Edit(int id)
         {
             List<Employee> employeeById = GetEmployeeList(id);
-            foreach(Employee e in employeeById)
+            foreach (Employee e in employeeById)
             {
                 if (e == null)
                 {
                     return NotFound();
                 }
-             
+
                 EmployeeEditViewModel viewModel = new EmployeeEditViewModel(_configuration.GetConnectionString("DefaultConnection"))
                 {
                     Departments = GetAllDepartments(),
+                    Computers = GetAllComputers(),
+                    TrainingPrograms = GetAllTrainingPrograms(),
                     Employee = e
                 };
                 return View(viewModel);
@@ -325,6 +327,7 @@ namespace BangazonWorkForce.Controllers
                 }
             }
         }
+
         private List<Department> GetAllDepartments()
         {
             using (SqlConnection conn = Connection)
@@ -348,6 +351,58 @@ namespace BangazonWorkForce.Controllers
                     reader.Close();
 
                     return deparments;
+                }
+            }
+        }
+        private List<TrainingProgram> GetAllTrainingPrograms()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT id, [Name] from TrainingProgram;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<TrainingProgram> programs = new List<TrainingProgram>();
+
+                    while (reader.Read())
+                    {
+                        programs.Add(new TrainingProgram
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name"))
+                        });
+                    }
+                    reader.Close();
+
+                    return programs;
+                }
+            }
+
+        }
+        private List<Computer> GetAllComputers()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT id, Make from Computer;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Computer> Computers = new List<Computer>();
+
+                    while (reader.Read())
+                    {
+                        Computers.Add(new Computer
+                        {
+                            id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Make = reader.GetString(reader.GetOrdinal("Make"))
+                        });
+                    }
+                    reader.Close();
+                    return Computers;
                 }
             }
 
