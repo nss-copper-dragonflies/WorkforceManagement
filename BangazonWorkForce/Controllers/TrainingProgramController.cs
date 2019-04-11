@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using BangazonWorkForce.Models;
 using BangazonWorkForce.Models.ViewModel;
+using BangazonWorkForce.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -65,26 +65,22 @@ namespace BangazonWorkForce.Controllers
         }
 
         // Get individual training program details with a list of employees attending the training program
-        public ActionResult Details(TrainingProgramDetailsViewModel ViewModel)
+        public ActionResult Details(int id)
         {
-           
-                using (SqlConnection conn = Connection)
-                {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = @"SELECT Name, StartDate,
-                                            EndDate, MaxAttendees
 
-                                            FROM TrainingProgram
+            TrainingProgram trainingProgram = GetTrainingProgramById(id);
+            if(trainingProgram == null)
+            {
+                return NotFound();
+            }
 
-                                            WHERE Id = @Id";
-                        cmd.Parameters.Add(new SqlParameter("@Id", ViewModel.TrainingProgram.Id));
-                        SqlDataReader reader = cmd.ExecuteReader();
-
-                    return RedirectToAction(nameof(Index));
-                    }
-                }
+            TrainingProgramDetailsViewModel viewModel = new TrainingProgramDetailsViewModel
+            {
+                Employees = GetAllEmployees(id),
+                TrainingProgram = trainingProgram
+            };
+            return View(viewModel);
+                
         }
 
         // GET: TrainingProgram/Create
@@ -171,6 +167,78 @@ namespace BangazonWorkForce.Controllers
             catch
             {
                 return View();
+            }
+        }
+
+        private TrainingProgram GetTrainingProgramById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT t.id AS TrainingProgramId, 
+                                                t.[Name], t.StartDate, 
+                                                t.EndDate, t.MaxAttendees
+                                            FROM TrainingProgram t
+                                            WHERE Id = @Id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    TrainingProgram trainingProgram = null;
+
+                    if (reader.Read())
+                    {
+                        trainingProgram = new TrainingProgram
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("TrainingProgramId")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                        };
+                    }
+
+                    reader.Close();
+
+                    return trainingProgram;
+                }
+            }
+        }
+
+        private List<Employee> GetAllEmployees(int TrainingProgramId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT e.id AS EmployeeId, e.FirstName, e.LastName,
+                                            e.IsSupervisor, e.DepartmentId
+                                            FROM TrainingProgram t
+                                            INNER JOIN EmployeeTraining et ON t.Id = et.TrainingProgramId
+                                            INNER JOIN Employee e ON et.EmployeeId = e.Id
+                                            WHERE t.Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", TrainingProgramId));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Employee> employees = new List<Employee>();
+
+                    while (reader.Read())
+                    {
+                        employees.Add(new Employee
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
+                        });
+                    }
+                    reader.Close();
+
+                    return employees;
+                }
             }
         }
     }
