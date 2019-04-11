@@ -122,11 +122,11 @@ namespace BangazonWorkForce.Controllers
                         {
                             Employee currentemployee = employees[employeeid];
 
-                            if (!currentemployee.TrainingProgramList.Any(x => x.id == reader.GetInt32(reader.GetOrdinal("tpId"))))
+                            if (!currentemployee.TrainingProgramList.Any(x => x.Id == reader.GetInt32(reader.GetOrdinal("tpId"))))
                             {
                                 currentemployee.TrainingProgramList.Add(new TrainingProgram
                                 {
-                                    id = reader.GetInt32(reader.GetOrdinal("tpId")),
+                                    Id = reader.GetInt32(reader.GetOrdinal("tpId")),
                                     Name = reader.GetString(reader.GetOrdinal("tpName"))
                                 });
                             }
@@ -185,22 +185,26 @@ namespace BangazonWorkForce.Controllers
         }
 
         // GET: Employee/Edit/5
-        //public ActionResult Edit(int id)
-        //{
-        //    Employee employee = GetInstructorById(id);
-        //    if (instructor == null)
-        //    {
-        //        return NotFound();
-        //    }
+        public ActionResult Edit(int id)
+        {
+            List<Employee> employeeById = GetEmployeeList(id);
+            foreach(Employee e in employeeById)
+            {
+                if (e == null)
+                {
+                    return NotFound();
+                }
+             
+                EmployeeEditViewModel viewModel = new EmployeeEditViewModel(_configuration.GetConnectionString("DefaultConnection"))
+                {
+                    Departments = GetAllDepartments(),
+                    Employee = e
+                };
+                return View(viewModel);
+            }
+            return View();
 
-        //    InstructorEditViewModel viewModel = new InstructorEditViewModel
-        //    {
-        //        Cohorts = GetAllCohorts(),
-        //        Instructor = instructor
-        //    };
-
-        //    return View(viewModel);
-        //}
+        }
 
         // POST: Employee/Edit/5
         [HttpPost]
@@ -240,6 +244,109 @@ namespace BangazonWorkForce.Controllers
             {
                 return View();
             }
+        }
+
+        private List<Employee> GetEmployeeList(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"select et.EmployeeId as etId, ec.EmployeeId as ecId, e.Id, d.Id as dId, e.FirstName, e.LastName, d.[Name], c.Make, c.Manufacturer, tp.[Name] as tpName, tp.Id as tpId
+                                        from Employee e
+                                        left join department d on e.DepartmentId = d.Id
+                                        left join ComputerEmployee ec on  ec.EmployeeId = e.Id
+                                        left join Computer c on ec.ComputerId = c.Id
+                                        left join EmployeeTraining et on et.EmployeeId = e.Id
+                                        left join TrainingProgram tp on et.TrainingProgramId = tp.Id
+                                        where e.Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Dictionary<int, Employee> employees = new Dictionary<int, Employee>();
+
+                    while (reader.Read())
+                    {
+                        int employeeid = reader.GetInt32(reader.GetOrdinal("Id"));
+
+                        if (!employees.ContainsKey(employeeid))
+                        {
+
+                            Employee employee = new Employee
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                DepartmentId = reader.GetInt32(reader.GetOrdinal("dId")),
+                                TrainingProgramList = new List<TrainingProgram>(),
+                                Computer = new Computer(),
+                                Department = new Department
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("dId")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                },
+                            };
+                            employees.Add(employeeid, employee);
+                        };
+                        if (!reader.IsDBNull(reader.GetOrdinal("ecId")))
+                        {
+                            Employee currentemployee = employees[employeeid];
+                            currentemployee.Computer = new Computer
+                            {
+                                Make = reader.GetString(reader.GetOrdinal("Make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                            };
+                        }
+                        if (!reader.IsDBNull(reader.GetOrdinal("etId")))
+                        {
+                            Employee currentemployee = employees[employeeid];
+
+                            if (!currentemployee.TrainingProgramList.Any(x => x.Id == reader.GetInt32(reader.GetOrdinal("tpId"))))
+                            {
+                                currentemployee.TrainingProgramList.Add(new TrainingProgram
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("tpId")),
+                                    Name = reader.GetString(reader.GetOrdinal("tpName"))
+                                });
+                            }
+                        }
+                    }
+
+                    reader.Close();
+
+                    List<Employee> employeeDetail = employees.Values.ToList();
+
+                    return employeeDetail;
+                }
+            }
+        }
+        private List<Department> GetAllDepartments()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT id, [Name] from Department;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Department> deparments = new List<Department>();
+
+                    while (reader.Read())
+                    {
+                        deparments.Add(new Department
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name"))
+                        });
+                    }
+                    reader.Close();
+
+                    return deparments;
+                }
+            }
+
         }
     }
 }
