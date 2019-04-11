@@ -33,7 +33,7 @@
                 @Html.DisplayFor(modelItem => item.id)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Make)
+                @Html.ActionLink(item.Make, "Details", new { id = item.id }) 
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Manufacturer)
@@ -41,11 +41,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.purchaseDate)
             </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new {  id=item.id  }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
+
         </tr>
 }
     </tbody>

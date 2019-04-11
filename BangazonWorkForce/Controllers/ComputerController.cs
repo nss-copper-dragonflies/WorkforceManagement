@@ -98,48 +98,65 @@ namespace BangazonWorkForce.Controllers
         // POST: Computer/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Computer computer)
         {
             try
             {
                 // TODO: Add insert logic here
+                using(SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"INSERT INTO computer (Make, Manufacturer, PurchaseDate)
+                                            VALUES (@make, @manufacturer, @purchaseDate)";
+                        cmd.Parameters.Add(new SqlParameter("@make", computer.Make));
+                        cmd.Parameters.Add(new SqlParameter("@manufacturer", computer.Manufacturer));
+                        cmd.Parameters.Add(new SqlParameter("@purchaseDate", computer.purchaseDate));
 
-                return RedirectToAction(nameof(Index));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+
+                    }
+                }
             }
             catch
             {
-                return View();
-            }
-        }
-
-        // GET: Computer/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Computer/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
+                return View(computer);
             }
         }
 
         // GET: Computer/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
-        }
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"select Make, Manufacturer, PurchaseDate 
+                                        from computer
+                                        where Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Computer computer = null;
+
+                    if (reader.Read())
+                    {
+                        computer = new Computer
+                        {
+                            Make = reader.GetString(reader.GetOrdinal("Make")),
+                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                            purchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
+                        };
+                    }
+                    reader.Close();
+                    return View(computer);
+                }
+            }
+        }   
 
         // POST: Computer/Delete/5
         [HttpPost]
@@ -149,8 +166,20 @@ namespace BangazonWorkForce.Controllers
             try
             {
                 // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"DELETE from computer where id = @id 
+                                            AND NOT exists(select EmployeeId from [ComputerEmployee] 
+                                            WHERE EmployeeId = @id)";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                    
+                    return RedirectToAction(nameof(Index));
             }
             catch
             {
