@@ -8,6 +8,10 @@ Bangazon Workforce Management enables HR to manage employees, departments and tr
 ### Employees
 
 ### Departments
+## Author: Jordan Rosas
+- User can view a list of Departments with the name of the department, Number of employees in that department, and the budget
+- User can Create a new department 
+- User can view details of a department and see a list of employees in the details
 
 ### Training Programs
 The user has the ability to view all future training programs and create new training programs and assign their start date, end date, and maximum number of attendees.

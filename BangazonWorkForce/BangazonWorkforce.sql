@@ -59,7 +59,9 @@ insert into Department ([Name], Budget) values ('Sales', 450000)
 
 insert into Employee (FirstName, LastName, DepartmentId, IsSuperVisor)  values ('Hernando', 'Rivera', 1, 0)
 insert into Employee (FirstName, LastName, DepartmentId, IsSuperVisor)  values ('Mary', 'Phillips', 2, 0)
-insert into Employee (FirstName, LastName, DepartmentId, IsSuperVisor)  values ('Lorenzo', 'Lopez', 1, 1)
+insert into Employee (FirstName, LastName, DepartmentId, IsSuperVisor)  values ('Lorenzo', 'Lopez', 3, 1)
+insert into Employee (FirstName, LastName, DepartmentId, IsSuperVisor)  values ('Terry', 'Cruz', 3, 1)
+insert into Employee (FirstName, LastName, DepartmentId, IsSuperVisor)  values ('Orlando', 'Blume', 3, 1)
 
 insert into  ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) values (1, 1, '01 Jan 2019', NULL)
 insert into  ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) values (2, 2, '01 Jan 2018', NULL)
