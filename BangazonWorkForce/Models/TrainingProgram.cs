@@ -11,6 +11,8 @@ namespace BangazonWorkForce.Models
         public string Name { get; set; }
         public DateTime StartDate { get; set; } = new DateTime();
         public DateTime EndDate { get; set; } = new DateTime();
+        public static DateTime Now { get; }
+
         public int MaxAttendees { get; set; }
     }
 }
