@@ -25,7 +25,10 @@ The user has the ability to view all future training programs and create new tra
 Bangazon Workforce Management enables IT to manage and assign computers.
 
 ### Computers
-
+## AUTHOR: JORDAN ROSAS
+- IT can create computers
+- IT can Delete computers only if it is not assigned to anyone
+- IT can View Details of the Computers
 
 #### Authors
 Ashwin Prakash, Brittany Ramos-Janeway, and Jordan Rosas
