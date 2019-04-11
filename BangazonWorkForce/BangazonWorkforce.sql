@@ -74,6 +74,8 @@ insert into TrainingProgram ([Name], StartDate, EndDate, MaxAttendees) values ('
 insert into TrainingProgram ([Name], StartDate, EndDate, MaxAttendees) values ('How to Sell Cars', '14 Feb 2020', '15 Feb 2020', 12)
 
 insert into EmployeeTraining (EmployeeId, TrainingProgramId) values (1, 1)
+insert into EmployeeTraining (EmployeeId, TrainingProgramId) values (1, 3)
+insert into EmployeeTraining (EmployeeId, TrainingProgramId) values (1, 4)
 insert into EmployeeTraining (EmployeeId, TrainingProgramId) values (2, 2)
 insert into EmployeeTraining (EmployeeId, TrainingProgramId) values (3, 3)
 insert into EmployeeTraining (EmployeeId, TrainingProgramId) values (3, 4)
