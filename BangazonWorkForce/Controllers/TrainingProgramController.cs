@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
+//Author: Brittany Ramos-Janeway
+
 namespace BangazonWorkForce.Controllers
 {
     public class TrainingProgramController : Controller
@@ -83,13 +85,13 @@ namespace BangazonWorkForce.Controllers
                 
         }
 
-        // GET: TrainingProgram/Create
+        // Directs user to the page in which they can create a new training program
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: TrainingProgram/Create
+        // Once the user has created a training program, it is added to the database
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(TrainingProgram trainingProgram)
@@ -124,7 +126,7 @@ namespace BangazonWorkForce.Controllers
             }
         }
 
-        // GET: TrainingProgram/Edit/5
+        // The user is directed to a page where they are able to edit the training program they have selected, and the fields are pre-filled with the program's current information
         public ActionResult Edit(int id)
         {
             TrainingProgram trainingProgram = GetTrainingProgramById(id);
@@ -136,7 +138,7 @@ namespace BangazonWorkForce.Controllers
             return View(trainingProgram);
         }
 
-        // POST: TrainingProgram/Edit/5
+        // Once the user has made the desired edits they are then added to the database
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, TrainingProgram trainingProgram)
@@ -195,6 +197,7 @@ namespace BangazonWorkForce.Controllers
             }
         }
 
+        // This method is used to get an individual training program by its Id. It is used for the details and edit methods.
         private TrainingProgram GetTrainingProgramById(int id)
         {
             using (SqlConnection conn = Connection)
@@ -231,6 +234,7 @@ namespace BangazonWorkForce.Controllers
             }
         }
 
+        // This method is used to get all the employees for a training program in order to display them in the program's details
         private List<Employee> GetAllEmployees(int TrainingProgramId)
         {
             using (SqlConnection conn = Connection)
