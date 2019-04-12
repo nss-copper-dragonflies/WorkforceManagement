@@ -9,6 +9,10 @@ Bangazon is a virtual marketplace that allows customers to buy and sell products
 Bangazon Workforce Management enables HR to manage employees, departments and training programs.
 
 ### Employees
+##Ashwin Prakash
+-User can see the list of employees and their department they belong too
+-User can create an Employee with deaprtment info
+-User can view details of an individual employee including assigned computer and training programs they have participated and signed up for
 
 ### Departments
 ## Author: Jordan Rosas
