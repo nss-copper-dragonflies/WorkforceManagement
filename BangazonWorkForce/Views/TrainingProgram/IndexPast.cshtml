@@ -1,4 +1,6 @@
-﻿@model IEnumerable<BangazonWorkForce.Models.TrainingProgram>
+﻿@*Author: Brittany Ramos-Janeway*@
+
+@model IEnumerable<BangazonWorkForce.Models.TrainingProgram>
 
 @{
     ViewData["Title"] = "IndexPast";
@@ -28,28 +30,29 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MaxAttendees)
-            </td>
-            <td>
-                @Html.ActionLink("Details", "DetailsPast", new { id = item.Id })
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaxAttendees)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "DetailsPast", new { id = item.Id })
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 <p>

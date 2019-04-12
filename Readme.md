@@ -23,7 +23,7 @@ Bangazon Workforce Management enables HR to manage employees, departments and tr
 ---
 ###### Author: Brittany Ramos-Janeway
 The user has the ability to view all future training programs and create new training programs and assign their start date, end date, and maximum number of attendees. The user can see the details for each training program when they click the "Details" button, and they will be able to see the employees that will be attending the program. The user is able to edit any future training program.
-There is a button on the main Training Programs page that allows users to view a list of past programs.
+There is a button on the main Training Programs page that allows users to view a list of past programs. If the user clicks on the "Details" button, they are presented with the information specific to the program including a list of employees that attended the program.
 
 
 ## IT
