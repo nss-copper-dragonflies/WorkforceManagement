@@ -1,7 +1,7 @@
 ﻿@model BangazonWorkForce.Models.ViewModel.TrainingProgramDetailsViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "DetailsPast";
 }
 
 <h1>Details</h1>
@@ -46,6 +46,5 @@
     </dl>
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.TrainingProgram.Id }) |
-    <a asp-action="Index">Go Back</a> |
+    <a asp-action="IndexPast">Go Back</a>
 </div>

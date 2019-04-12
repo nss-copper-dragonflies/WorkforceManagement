@@ -122,6 +122,25 @@ namespace BangazonWorkForce.Controllers
                 
         }
 
+        // Get individual past training program details with a list of employees that attended the training program
+        public ActionResult DetailsPast(int id)
+        {
+
+            TrainingProgram trainingProgram = GetTrainingProgramById(id);
+            if (trainingProgram == null)
+            {
+                return NotFound();
+            }
+
+            TrainingProgramDetailsViewModel viewModel = new TrainingProgramDetailsViewModel
+            {
+                Employees = GetAllEmployees(id),
+                TrainingProgram = trainingProgram
+            };
+            return View(viewModel);
+
+        }
+
         // Directs user to the page in which they can create a new training program
         public ActionResult Create()
         {
