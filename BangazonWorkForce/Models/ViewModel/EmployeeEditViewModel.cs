@@ -12,18 +12,22 @@ namespace BangazonWorkForce.Models.ViewModel
         public EmployeeEditViewModel()
         {
             Departments = new List<Department>();
-            TrainingPrograms = new List<TrainingProgram>();
+            TrainingProgramList = new List<TrainingProgram>();
             Computers = new List<Computer>();
+            allTrainingPrograms = new List<TrainingProgram>();
+
         }
 
         public Employee Employee { get; set; }
         public TrainingProgram trainingProgram { get; set; }
         public Computer computer { get; set; }
-        public List<TrainingProgram> TrainingPrograms { get; set; }
+        public List<TrainingProgram> TrainingProgramList{ get; set; }
+        public List<TrainingProgram> allTrainingPrograms { get; set; }
+
         public List<Computer> Computers { get; set; }
         public List<Department> Departments { get; set; }
 
-        public EmployeeEditViewModel(string connectionString)
+        public EmployeeEditViewModel(string connectionString, int id)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -33,11 +37,11 @@ namespace BangazonWorkForce.Models.ViewModel
                     cmd.CommandText = @"SELECT id, [Name] from TrainingProgram;";
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    TrainingPrograms = new List<TrainingProgram>();
+                    allTrainingPrograms = new List<TrainingProgram>();
 
                     while (reader.Read())
                     {
-                        TrainingPrograms.Add(new TrainingProgram
+                        allTrainingPrograms.Add(new TrainingProgram
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name"))
@@ -51,7 +55,10 @@ namespace BangazonWorkForce.Models.ViewModel
                 conn1.Open();
                 using (SqlCommand cmd = conn1.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT id, Make from Computer;";
+                    cmd.CommandText = @"SELECT c.id as cId, Make from Computer c
+                                        left join ComputerEmployee ce on ce.ComputerId = c.Id
+                                        where ce.EmployeeId is null or ce.employeeid = @id or ce.UnassignDate is not null ";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     Computers = new List<Computer>();
@@ -60,7 +67,7 @@ namespace BangazonWorkForce.Models.ViewModel
                     {
                         Computers.Add(new Computer
                         {
-                            id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            id = reader.GetInt32(reader.GetOrdinal("cId")),
                             Make = reader.GetString(reader.GetOrdinal("Make"))
                         });
                     }
@@ -77,28 +84,28 @@ namespace BangazonWorkForce.Models.ViewModel
                     return null;
                 }
 
-                return Computers.Select(d => new SelectListItem
+                return Computers.Select(c => new SelectListItem
                 {
-                    Value = d.id.ToString(),
-                    Text = d.Make
+                    Value = c.id.ToString(),
+                    Text = c.Make
                 }).ToList();
             }
         }
-
-
+        
+       
         public List<SelectListItem> TrainingProgramOptions
         {
             get
             {
-                if (TrainingPrograms == null)
+                if (allTrainingPrograms == null)
                 {
                     return null;
                 }
 
-                return TrainingPrograms.Select(d => new SelectListItem
+                return allTrainingPrograms.Select(tp => new SelectListItem
                 {
-                    Value = d.Id.ToString(),
-                    Text = d.Name
+                    Value = tp.Id.ToString(),
+                    Text = tp.Name
                 }).ToList();
             }
         }

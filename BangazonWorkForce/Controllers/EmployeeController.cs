@@ -192,19 +192,22 @@ namespace BangazonWorkForce.Controllers
         public ActionResult Edit(int id)
         {
             List<Employee> employeeById = GetEmployeeList(id);
+
             foreach (Employee e in employeeById)
             {
+                e.TrainingProgramList = GetYourTrainingPrograms(e.Id);
                 if (e == null)
                 {
                     return NotFound();
                 }
 
-                EmployeeEditViewModel viewModel = new EmployeeEditViewModel(_configuration.GetConnectionString("DefaultConnection"))
+                EmployeeEditViewModel viewModel = new EmployeeEditViewModel(_configuration.GetConnectionString("DefaultConnection"), e.Id)
                 {
                     Departments = GetAllDepartments(),
-                    Computers = GetAllComputers(),
-                    TrainingPrograms = GetAllTrainingPrograms(),
-                    Employee = e
+                    Computers = GetAllComputers(e.Id),
+                    TrainingProgramList = GetYourTrainingPrograms(e.Id),
+                    allTrainingPrograms = GetAllTrainingPrograms(),
+                    Employee = e,
                 };
                 return View(viewModel);
             }
@@ -354,14 +357,18 @@ namespace BangazonWorkForce.Controllers
                 }
             }
         }
-        private List<TrainingProgram> GetAllTrainingPrograms()
+        private List<TrainingProgram> GetYourTrainingPrograms(int id)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT id, [Name] from TrainingProgram;";
+                    cmd.CommandText = @"SELECT tp.id as tpId, [Name], e.id from TrainingProgram tp
+                                       left join employeetraining et on et.trainingprogramid = tp.id 
+                                       left join employee e on et.EmployeeId = e.id
+										where e.id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<TrainingProgram> programs = new List<TrainingProgram>();
@@ -381,14 +388,18 @@ namespace BangazonWorkForce.Controllers
             }
 
         }
-        private List<Computer> GetAllComputers()
+
+        private List<Computer> GetAllComputers(int id)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT id, Make from Computer;";
+                    cmd.CommandText = @"SELECT c.id as cId, Make from Computer c
+                                        left join ComputerEmployee ce on ce.ComputerId = c.Id
+                                        where ce.EmployeeId is null or ce.employeeid = @id or ce.UnassignDate is not null ";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Computer> Computers = new List<Computer>();
@@ -397,12 +408,39 @@ namespace BangazonWorkForce.Controllers
                     {
                         Computers.Add(new Computer
                         {
-                            id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            id = reader.GetInt32(reader.GetOrdinal("cId")),
                             Make = reader.GetString(reader.GetOrdinal("Make"))
                         });
                     }
                     reader.Close();
                     return Computers;
+                }
+            }
+        }
+        
+
+        private List<TrainingProgram> GetAllTrainingPrograms()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT id, [Name] from TrainingProgram;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<TrainingProgram> allPrograms = new List<TrainingProgram>();
+
+                    while (reader.Read())
+                    {
+                        allPrograms.Add(new TrainingProgram
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name"))
+                        });
+                    }
+                    reader.Close();
+                    return allPrograms;
                 }
             }
 
