@@ -67,6 +67,42 @@ namespace BangazonWorkForce.Controllers
             }
         }
 
+        // Get all past training programs
+        public ActionResult IndexPast()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, Name, StartDate, 
+                                            EndDate, MaxAttendees
+	                                        FROM TrainingProgram
+	                                        WHERE StartDate < GETDATE()";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+                    while (reader.Read())
+                    {
+                        TrainingProgram trainingProgram = new TrainingProgram
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                        };
+
+                        trainingPrograms.Add(trainingProgram);
+                    }
+
+                    reader.Close();
+
+                    return View(trainingPrograms);
+                }
+            }
+        }
+
         // Get individual training program details with a list of employees attending the training program
         public ActionResult Details(int id)
         {
