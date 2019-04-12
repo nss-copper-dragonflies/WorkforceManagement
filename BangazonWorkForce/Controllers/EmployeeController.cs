@@ -101,7 +101,7 @@ namespace BangazonWorkForce.Controllers
                                 FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                                 LastName = reader.GetString(reader.GetOrdinal("LastName")),
                                 DepartmentId = reader.GetInt32(reader.GetOrdinal("dId")),
-                                TrainingProgramList = new List<TrainingProgram>(),
+                                CurrentTrainingPrograms = new List<TrainingProgram>(),
                                 Computer = new Computer(),
                                 Department = new Department
                                 {
@@ -124,9 +124,9 @@ namespace BangazonWorkForce.Controllers
                         {
                             Employee currentemployee = employees[employeeid];
 
-                            if (!currentemployee.TrainingProgramList.Any(x => x.Id == reader.GetInt32(reader.GetOrdinal("tpId"))))
+                            if (!currentemployee.CurrentTrainingPrograms.Any(x => x.Id == reader.GetInt32(reader.GetOrdinal("tpId"))))
                             {
-                                currentemployee.TrainingProgramList.Add(new TrainingProgram
+                                currentemployee.CurrentTrainingPrograms.Add(new TrainingProgram
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("tpId")),
                                     Name = reader.GetString(reader.GetOrdinal("tpName")),
@@ -195,17 +195,21 @@ namespace BangazonWorkForce.Controllers
 
             foreach (Employee e in employeeById)
             {
-                e.TrainingProgramList = GetYourTrainingPrograms(e.Id);
+                e.CurrentTrainingPrograms = GetYourTrainingPrograms(e.Id);
                 if (e == null)
                 {
                     return NotFound();
                 }
 
+
+                var currenttrainingPrograms = GetYourTrainingPrograms(e.Id);
+
                 EmployeeEditViewModel viewModel = new EmployeeEditViewModel(_configuration.GetConnectionString("DefaultConnection"), e.Id)
                 {
                     Departments = GetAllDepartments(),
                     Computers = GetAllComputers(e.Id),
-                    TrainingProgramList = GetYourTrainingPrograms(e.Id),
+                    CurrentTrainingPrograms = currenttrainingPrograms,
+                    SelectedTrainingPrograms = currenttrainingPrograms.Select(tp => tp.Id).ToList(),
                     allTrainingPrograms = GetAllTrainingPrograms(),
                     Employee = e,
                 };
@@ -218,19 +222,59 @@ namespace BangazonWorkForce.Controllers
         // POST: Employee/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, EmployeeEditViewModel viewModel)
         {
-            try
+            using (SqlConnection conn = Connection)
             {
-                // TODO: Add update logic here
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE employee 
+                                        SET firstname = @firstname, 
+                                        lastname = @lastname,
+                                        IsSuperVisor = @isupervisor, 
+                                        DepartmentId = @departmentid
+                                        where id = @id;
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
+                                        UPDATE ComputerEmployee
+                                        set ComputerId = @computerid
+                                        where EmployeeId = @id;
+
+                                        DELETE from EmployeeTraining
+                                        where EmployeeId = @id;";
+                    
+                    cmd.Parameters.Add(new SqlParameter("@firstname", viewModel.Employee.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@lastname", viewModel.Employee.LastName));
+                    cmd.Parameters.Add(new SqlParameter("@isupervisor", viewModel.Employee.IsSupervisor));
+                    cmd.Parameters.Add(new SqlParameter("@departmentid", viewModel.Employee.DepartmentId));
+                    cmd.Parameters.Add(new SqlParameter("@computerid", viewModel.Employee.Computer.id));
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                        
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = @"insert into EmployeeTraining
+                                        values(@id, @trainingprogramId);";
+
+                    foreach (int tpId in viewModel.SelectedTrainingPrograms)
+                    {
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.Parameters.Add(new SqlParameter("@trainingprogramId", tpId));
+                        cmd.ExecuteNonQuery();
+                    }
+
+
+
+                    return RedirectToAction(nameof(Index));
+                }
             }
         }
+            
+            //catch
+            //{
+            //    viewModel.Cohorts = GetAllCohorts();
+            //    return View();
+            //}
 
         // GET: Employee/Delete/5
         public ActionResult Delete(int id)
@@ -288,7 +332,7 @@ namespace BangazonWorkForce.Controllers
                                 FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                                 LastName = reader.GetString(reader.GetOrdinal("LastName")),
                                 DepartmentId = reader.GetInt32(reader.GetOrdinal("dId")),
-                                TrainingProgramList = new List<TrainingProgram>(),
+                                CurrentTrainingPrograms = new List<TrainingProgram>(),
                                 Computer = new Computer(),
                                 Department = new Department
                                 {
@@ -311,9 +355,9 @@ namespace BangazonWorkForce.Controllers
                         {
                             Employee currentemployee = employees[employeeid];
 
-                            if (!currentemployee.TrainingProgramList.Any(x => x.Id == reader.GetInt32(reader.GetOrdinal("tpId"))))
+                            if (!currentemployee.CurrentTrainingPrograms.Any(x => x.Id == reader.GetInt32(reader.GetOrdinal("tpId"))))
                             {
-                                currentemployee.TrainingProgramList.Add(new TrainingProgram
+                                currentemployee.CurrentTrainingPrograms.Add(new TrainingProgram
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("tpId")),
                                     Name = reader.GetString(reader.GetOrdinal("tpName"))
@@ -377,7 +421,7 @@ namespace BangazonWorkForce.Controllers
                     {
                         programs.Add(new TrainingProgram
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Id = reader.GetInt32(reader.GetOrdinal("tpId")),
                             Name = reader.GetString(reader.GetOrdinal("Name"))
                         });
                     }

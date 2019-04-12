@@ -12,7 +12,7 @@ namespace BangazonWorkForce.Models.ViewModel
         public EmployeeEditViewModel()
         {
             Departments = new List<Department>();
-            TrainingProgramList = new List<TrainingProgram>();
+            CurrentTrainingPrograms = new List<TrainingProgram>();
             Computers = new List<Computer>();
             allTrainingPrograms = new List<TrainingProgram>();
 
@@ -20,8 +20,9 @@ namespace BangazonWorkForce.Models.ViewModel
 
         public Employee Employee { get; set; }
         public TrainingProgram trainingProgram { get; set; }
-        public Computer computer { get; set; }
-        public List<TrainingProgram> TrainingProgramList{ get; set; }
+        public Computer Computer { get; set; }
+        public List<TrainingProgram> CurrentTrainingPrograms{ get; set; }
+        public List<int> SelectedTrainingPrograms{ get; set; }
         public List<TrainingProgram> allTrainingPrograms { get; set; }
 
         public List<Computer> Computers { get; set; }
@@ -102,6 +103,8 @@ namespace BangazonWorkForce.Models.ViewModel
                     return null;
                 }
 
+
+
                 return allTrainingPrograms.Select(tp => new SelectListItem
                 {
                     Value = tp.Id.ToString(),
@@ -109,6 +112,8 @@ namespace BangazonWorkForce.Models.ViewModel
                 }).ToList();
             }
         }
+        //list ints youretaininglist .select
+        //new select list lit item of all alltraining foreacg id in list int if it matches the dropdown use Selected
 
         public List<SelectListItem> DepartmentOptions
         {

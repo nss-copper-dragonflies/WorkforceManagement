@@ -49,9 +49,9 @@
         <dt class="col-sm-2">
             Upcoming or Current TrainingPrograms
         </dt>
-        @if (Model.TrainingProgramList.Count > 0)
+        @if (Model.CurrentTrainingPrograms.Count > 0)
         {
-            @foreach (var item in Model.TrainingProgramList)
+            @foreach (var item in Model.CurrentTrainingPrograms)
             {
                 if (item.EndDate >= DateTime.Now)
                 {
@@ -74,9 +74,9 @@
             Completed TrainingPrograms
         </dt>
 
-        @if (Model.TrainingProgramList.Count > 0)
+        @if (Model.CurrentTrainingPrograms.Count > 0)
         {
-            @foreach (var item in Model.TrainingProgramList)
+            @foreach (var item in Model.CurrentTrainingPrograms)
             {
                 if (item.EndDate <= DateTime.Now)
                 {

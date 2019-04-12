@@ -23,7 +23,7 @@ namespace BangazonWorkForce.Models
             }
         }
 
-        public List<TrainingProgram> TrainingProgramList { get; set; }
+        public List<TrainingProgram> CurrentTrainingPrograms { get; set; }
         public List<TrainingProgram> allTrainingPrograms { get; set; }
 
     }
