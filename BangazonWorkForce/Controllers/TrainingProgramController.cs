@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 //Author: Brittany Ramos-Janeway
+//This is the controller for training programs and it facilitates obtaining the records to view all training programs, view the details of a single training program, edit training programs, create new training programs, and delete future training programs.
 
 namespace BangazonWorkForce.Controllers
 {
@@ -174,22 +175,38 @@ namespace BangazonWorkForce.Controllers
             }
         }
 
-        // GET: TrainingProgram/Delete/5
+        // If the training program exists this passes the program to be deleted to the delete view so that the user can ensure they are choosing to delete the correct record
         public ActionResult Delete(int id)
         {
-            return View();
+            TrainingProgram trainingProgram = GetTrainingProgramById(id);
+            if (trainingProgram == null)
+            {
+                return NotFound();
+            }
+            return View(trainingProgram);
         }
 
-        // POST: TrainingProgram/Delete/5
+        // Once the user decides which record to delete this method deletes the record from the database
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, TrainingProgram trainingProgram)
         {
             try
             {
-                // TODO: Add delete logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"DELETE FROM TrainingProgram 
+                                            WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", trainingProgram.Id));
 
-                return RedirectToAction(nameof(Index));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
             }
             catch
             {
