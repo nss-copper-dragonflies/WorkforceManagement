@@ -5,6 +5,17 @@ select id, Make, Manufacturer, PurchaseDate
 from computer
 where Id = 1
 
+select * from ComputerEmployee
+
+select employee.FirstName, employee.LastName, computer.Id, computer.Make, computer.Manufacturer
+from ComputerEmployee
+left join employee on ComputerEmployee.EmployeeId = employee.Id
+left join computer on ComputerEmployee.ComputerId = computer.id
+
+
+
+
+
 select e.FirstName, e.LastName, d.[name], d.budget
 from Employee e left join department d on e.departmentId = d.id
 where e.departmentId = d.id
