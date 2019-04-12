@@ -3,7 +3,7 @@ Bangazon is a virtual marketplace that allows customers to buy and sell products
 
 
 ## Entity Relationship Diagram
-![Image of the Entity Relationship Diagram](ERD.png)
+![Image of the Entity Relationship Diagram](/ERD.png)
 
 ## Human Resources
 Bangazon Workforce Management enables HR to manage employees, departments and training programs.
