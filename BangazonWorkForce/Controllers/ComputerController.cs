@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonWorkForce.Models;
+using BangazonWorkForce.Models.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -92,7 +93,9 @@ namespace BangazonWorkForce.Controllers
         // GET: Computer/Create
         public ActionResult Create()
         {
-            return View();
+            ComputerCreateViewModel viewModel =
+            new ComputerCreateViewModel(_config.GetConnectionString("DefaultConnection"));
+            return View(viewModel);
         }
 
         // POST: Computer/Create

@@ -15,5 +15,8 @@ namespace BangazonWorkForce.Models
         public DateTime? DecommisionDate { get; set; }
         public string Make { get; set; }
         public string Manufacturer { get; set; }
+
+        [Display(Name = "Employees")]
+        public string employees { get; set; }
     }
 }
