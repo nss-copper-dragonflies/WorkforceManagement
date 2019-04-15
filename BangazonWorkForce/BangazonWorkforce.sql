@@ -52,6 +52,9 @@ CREATE TABLE EmployeeTraining (
 insert into Computer (PurchaseDate, DecomissionDate, Make, Manufacturer) values ('01 Jan 2019', '01 Jan 2024', 'MacBook Pro', 'Apple')
 insert into Computer (PurchaseDate, DecomissionDate, Make, Manufacturer) values ('01 Jan 2018', '01 Jan 2023', 'Inspiron', 'Dell')
 insert into Computer (PurchaseDate, DecomissionDate, Make, Manufacturer) values ('01 Jan 2017', '01 Jan 2022', 'MacBook Air', 'Apple')
+insert into Computer (PurchaseDate, DecomissionDate, Make, Manufacturer) values ('01 Jan 2017', '01 Jan 2022', 'Mac Pro 2017', 'Apple')
+insert into Computer (PurchaseDate, DecomissionDate, Make, Manufacturer) values ('01 Jan 2017', '01 Jan 2022', 'XPS Professional', 'Dell')
+
 
 insert into Department ([Name], Budget) values ('Accounting', 400000)
 insert into Department ([Name], Budget) values ('IT', 40000)
@@ -66,7 +69,6 @@ insert into Employee (FirstName, LastName, DepartmentId, IsSuperVisor)  values (
 insert into  ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) values (1, 1, '01 Jan 2019', NULL)
 insert into  ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) values (2, 2, '01 Jan 2018', NULL)
 insert into  ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) values (3, 3, '01 Jan 2017', NULL)
-insert into  ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) values (3, 3, '01 Jan 2017', '01 Jan 2018')
 
 insert into TrainingProgram ([Name], StartDate, EndDate, MaxAttendees) values ('How to Count Beans', '14 Feb 2019', '15 Feb 2019', 10)
 insert into TrainingProgram ([Name], StartDate, EndDate, MaxAttendees) values ('How to Spell "IT"', '14 Feb 2019', '15 Feb 2019', 10)

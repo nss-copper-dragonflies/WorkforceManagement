@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BangazonAPI.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace BangazonWorkForce.Models
         public string Manufacturer { get; set; }    
         [Display(Name = "Purchase Date")]
         public DateTime purchaseDate { get; set; }
+
+        public ComputerEmployee ComputerEmployee { get; set; }
 
         public DateTime? DecommisionDate { get; set; }
 
