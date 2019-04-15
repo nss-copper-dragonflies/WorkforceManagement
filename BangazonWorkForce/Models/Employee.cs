@@ -15,11 +15,16 @@ namespace BangazonWorkForce.Models
         public Department Department { get; set; }
         public Computer Computer { get; set; } = new Computer();
 
-        public string FullName { get
+        public string FullName
+        {
+            get
             {
                 return $"{FirstName} {LastName}";
-            } }
+            }
+        }
 
-        public List<TrainingProgram> TrainingProgramList { get; set; }
+        public List<TrainingProgram> CurrentTrainingPrograms { get; set; }
+        public List<TrainingProgram> allTrainingPrograms { get; set; }
+
     }
 }
