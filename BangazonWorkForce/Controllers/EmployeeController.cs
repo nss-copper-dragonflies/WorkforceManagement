@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using BangazonAPI.Models;
 using BangazonWorkForce.Models;
 using BangazonWorkForce.Models.ViewModel;
 using Microsoft.AspNetCore.Http;
@@ -208,6 +209,7 @@ namespace BangazonWorkForce.Controllers
                 {
                     Departments = GetAllDepartments(),
                     Computers = GetAllComputers(e.Id),
+                    Computer = GetComputerById(e.Id),
                     CurrentTrainingPrograms = currenttrainingPrograms,
                     SelectedTrainingPrograms = currenttrainingPrograms.Select(tp => tp.Id).ToList(),
                     allTrainingPrograms = GetAllTrainingPrograms(),
@@ -236,12 +238,9 @@ namespace BangazonWorkForce.Controllers
                                         DepartmentId = @departmentid
                                         where id = @id;
 
-                                        UPDATE ComputerEmployee
-                                        set ComputerId = @computerid
-                                        where EmployeeId = @id;
-
                                         DELETE from EmployeeTraining
                                         where EmployeeId = @id;";
+                
                     
                     cmd.Parameters.Add(new SqlParameter("@firstname", viewModel.Employee.FirstName));
                     cmd.Parameters.Add(new SqlParameter("@lastname", viewModel.Employee.LastName));
@@ -252,18 +251,38 @@ namespace BangazonWorkForce.Controllers
                         
                     cmd.ExecuteNonQuery();
 
-                    cmd.CommandText = @"insert into EmployeeTraining
-                                        values(@id, @trainingprogramId);";
-
-                    foreach (int tpId in viewModel.SelectedTrainingPrograms)
+                    if (viewModel.Computer.id == 0)
                     {
-                        cmd.Parameters.Clear();
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
-                        cmd.Parameters.Add(new SqlParameter("@trainingprogramId", tpId));
+                        cmd.CommandText = @"INSERT into ComputerEmployee(employeeId, computerId, assignDate)
+                                            values(@id, @computerid, GETDATE());";
+                        cmd.ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        cmd.CommandText = @"UPDATE ComputerEmployee
+                                            set ComputerId = @computerid
+                                            where EmployeeId = @id;
+                                            
+                                            UPDATE ComputerEmployee
+                                            set unassignDate = GETDATE()
+                                            WHERE Id = @Oldid";
+                        cmd.Parameters.Add(new SqlParameter("@Oldid", viewModel.Computer.ComputerEmployee.Id));
                         cmd.ExecuteNonQuery();
                     }
 
 
+                    cmd.CommandText = @"INSERT into EmployeeTraining
+                                        values(@id, @trainingprogramId);";
+                    if (viewModel.SelectedTrainingPrograms != null)
+                    {
+                        foreach (int tpId in viewModel.SelectedTrainingPrograms)
+                        {
+                            cmd.Parameters.Clear();
+                            cmd.Parameters.Add(new SqlParameter("@id", id));
+                            cmd.Parameters.Add(new SqlParameter("@trainingprogramId", tpId));
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
 
                     return RedirectToAction(nameof(Index));
                 }
@@ -276,28 +295,6 @@ namespace BangazonWorkForce.Controllers
             //    return View();
             //}
 
-        // GET: Employee/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: Employee/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
         private List<Employee> GetEmployeeList(int id)
         {
@@ -488,6 +485,45 @@ namespace BangazonWorkForce.Controllers
                 }
             }
 
+        }
+
+        private Computer GetComputerById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT c.id as cId, Make, e.Id, ce.id as ceid, ce.UnassignDate
+                                        from Computer c
+                                        left join ComputerEmployee ce on ce.ComputerId = c.Id
+                                        left join Employee e on ce.EmployeeId = e.id
+                                        where e.id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Computer idcomputer = null;
+
+                    while (reader.Read())
+                    {
+                        idcomputer = new Computer
+                        {
+                            id = reader.GetInt32(reader.GetOrdinal("cId")),
+                            Make = reader.GetString(reader.GetOrdinal("Make")),
+                            ComputerEmployee = new ComputerEmployee()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("ceid")),
+                            }
+                        };
+                        if (!reader.IsDBNull(reader.GetOrdinal("UnassignDate")))
+                        {
+                            idcomputer.ComputerEmployee.UnassignDate = reader.GetDateTime(reader.GetOrdinal("UnassignDate"));                           
+                        }
+                    }
+                    reader.Close();
+                    return idcomputer;
+                }
+            }
         }
     }
 }

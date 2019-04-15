@@ -15,7 +15,7 @@ namespace BangazonWorkForce.Models.ViewModel
             CurrentTrainingPrograms = new List<TrainingProgram>();
             Computers = new List<Computer>();
             allTrainingPrograms = new List<TrainingProgram>();
-
+            Computer = new Computer();
         }
 
         public Employee Employee { get; set; }
@@ -24,7 +24,6 @@ namespace BangazonWorkForce.Models.ViewModel
         public List<TrainingProgram> CurrentTrainingPrograms{ get; set; }
         public List<int> SelectedTrainingPrograms{ get; set; }
         public List<TrainingProgram> allTrainingPrograms { get; set; }
-
         public List<Computer> Computers { get; set; }
         public List<Department> Departments { get; set; }
 
