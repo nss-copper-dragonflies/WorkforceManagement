@@ -227,7 +227,6 @@ namespace BangazonWorkForce.Controllers
         public ActionResult Edit(int id, EmployeeEditViewModel viewModel)
         {
             Computer idcomputer = GetComputerById(id);
-
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
@@ -265,10 +264,15 @@ namespace BangazonWorkForce.Controllers
                         cmd.Parameters.Add(new SqlParameter("@Oldid", idcomputer.ComputerEmployee.Id));
                         cmd.ExecuteNonQuery();
                     }
-                    else
+                   else if(idcomputer.id == 0)
                     {
                         cmd.CommandText = @"INSERT into ComputerEmployee(employeeId, computerId, assignDate)
                                             values(@id, @computerid, GETDATE());";
+                        cmd.ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        cmd.CommandText = @"select id, employeeid, computerid from computerEmployee";
                         cmd.ExecuteNonQuery();
                     }
 
