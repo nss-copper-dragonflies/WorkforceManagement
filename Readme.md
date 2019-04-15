@@ -31,14 +31,14 @@ Bangazon Workforce Management enables IT to manage and assign computers.
 
 ### Computers
 ---
-###### AUTHOR: JORDAN ROSAS
+###### AUTHOR: JORDAN ROSAS & Brittany Ramos-Janeway
 - IT can create computers
 - IT can Delete computers only if it is not assigned to anyone
 - IT can View Details of the Computers
-
-Computer Search Functionality
-Author: Brittany Ramos-Janeway
-User can sort by computer make and model.
+- IT can assign an employee to a computer 
+- Cannot delete computer if it is being used by an employee
+- Computer Search Functionality
+- User can sort by computer make and model.
 
 #### Authors
 Ashwin Prakash, Brittany Ramos-Janeway, and Jordan Rosas
