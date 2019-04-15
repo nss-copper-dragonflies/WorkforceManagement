@@ -226,6 +226,8 @@ namespace BangazonWorkForce.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, EmployeeEditViewModel viewModel)
         {
+            Computer idcomputer = GetComputerById(id);
+
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
@@ -251,28 +253,29 @@ namespace BangazonWorkForce.Controllers
                         
                     cmd.ExecuteNonQuery();
 
-                    if (viewModel.Computer.id == 0)
+                    if ((idcomputer.id != 0) && (idcomputer.id != viewModel.Employee.Computer.id))
                     {
                         cmd.CommandText = @"INSERT into ComputerEmployee(employeeId, computerId, assignDate)
-                                            values(@id, @computerid, GETDATE());";
+                                            values(@id, @computerid, GETDATE());
+
+                                            UPDATE ComputerEmployee
+                                            set unassignDate = GETDATE()
+                                            WHERE Id = @Oldid;";
+
+                        cmd.Parameters.Add(new SqlParameter("@Oldid", idcomputer.ComputerEmployee.Id));
                         cmd.ExecuteNonQuery();
                     }
                     else
                     {
-                        cmd.CommandText = @"UPDATE ComputerEmployee
-                                            set ComputerId = @computerid
-                                            where EmployeeId = @id;
-                                            
-                                            UPDATE ComputerEmployee
-                                            set unassignDate = GETDATE()
-                                            WHERE Id = @Oldid";
-                        cmd.Parameters.Add(new SqlParameter("@Oldid", viewModel.Computer.ComputerEmployee.Id));
+                        cmd.CommandText = @"INSERT into ComputerEmployee(employeeId, computerId, assignDate)
+                                            values(@id, @computerid, GETDATE());";
                         cmd.ExecuteNonQuery();
                     }
 
 
                     cmd.CommandText = @"INSERT into EmployeeTraining
                                         values(@id, @trainingprogramId);";
+
                     if (viewModel.SelectedTrainingPrograms != null)
                     {
                         foreach (int tpId in viewModel.SelectedTrainingPrograms)
@@ -288,13 +291,7 @@ namespace BangazonWorkForce.Controllers
                 }
             }
         }
-            
-            //catch
-            //{
-            //    viewModel.Cohorts = GetAllCohorts();
-            //    return View();
-            //}
-
+           
 
         private List<Employee> GetEmployeeList(int id)
         {
