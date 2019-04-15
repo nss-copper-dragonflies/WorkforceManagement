@@ -28,15 +28,25 @@ namespace BangazonWorkForce.Controllers
         }
         // GET: Computer
         //Get method will return the list of computers makes and manufacturers
-        public ActionResult Index()
+        public ActionResult Index(string searchString)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT id, Make, Manufacturer, purchaseDate
-                                        From Computer";
+                        cmd.CommandText = @"SELECT id, Make, 
+                                                Manufacturer, purchaseDate
+                                            From Computer
+                                            WHERE 1 = 1";
+
+                    // In order to query the computer properties:
+                    if (!string.IsNullOrWhiteSpace(searchString))
+                    {
+                        cmd.CommandText += @" AND (Make LIKE @searchString OR
+                                              Manufacturer LIKE @searchString)";
+                        cmd.Parameters.Add(new SqlParameter("@searchString", $"%{searchString}%"));
+                    }
 
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Computer> computerList = new List<Computer>();
