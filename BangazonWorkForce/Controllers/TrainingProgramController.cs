@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 //Author: Brittany Ramos-Janeway
+//This is the controller for training programs and it facilitates obtaining the records to view all training programs, view the details of a single training program, edit training programs, create new training programs, and delete future training programs.
 
 namespace BangazonWorkForce.Controllers
 {
@@ -42,6 +43,42 @@ namespace BangazonWorkForce.Controllers
                                             EndDate, MaxAttendees
 	                                        FROM TrainingProgram
 	                                        WHERE StartDate >= GETDATE()";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+                    while (reader.Read())
+                    {
+                        TrainingProgram trainingProgram = new TrainingProgram
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                        };
+
+                        trainingPrograms.Add(trainingProgram);
+                    }
+
+                    reader.Close();
+
+                    return View(trainingPrograms);
+                }
+            }
+        }
+
+        // Get all past training programs
+        public ActionResult IndexPast()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, Name, StartDate, 
+                                            EndDate, MaxAttendees
+	                                        FROM TrainingProgram
+	                                        WHERE StartDate < GETDATE()";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
@@ -174,22 +211,38 @@ namespace BangazonWorkForce.Controllers
             }
         }
 
-        // GET: TrainingProgram/Delete/5
+        // If the training program exists this passes the program to be deleted to the delete view so that the user can ensure they are choosing to delete the correct record
         public ActionResult Delete(int id)
         {
-            return View();
+            TrainingProgram trainingProgram = GetTrainingProgramById(id);
+            if (trainingProgram == null)
+            {
+                return NotFound();
+            }
+            return View(trainingProgram);
         }
 
-        // POST: TrainingProgram/Delete/5
+        // Once the user decides which record to delete this method deletes the record from the database
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, TrainingProgram trainingProgram)
         {
             try
             {
-                // TODO: Add delete logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"DELETE FROM TrainingProgram 
+                                            WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", trainingProgram.Id));
 
-                return RedirectToAction(nameof(Index));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
             }
             catch
             {

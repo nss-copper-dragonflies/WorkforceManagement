@@ -81,7 +81,7 @@ namespace BangazonWorkForce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT d.Id, d.[name], d.Budget, e.Id as employeeId, e.FirstName
+                    cmd.CommandText = @"SELECT d.Id, d.[name], d.Budget, e.Id as employeeId, e.FirstName, e.LastName
                                         FROM Department d 
                                         left join Employee e
                                         ON e.DepartmentId = d.Id
@@ -110,7 +110,8 @@ namespace BangazonWorkForce.Controllers
                                 department.employeeList.Add(new Employee
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("employeeId")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName"))
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
                                 });
                         }
                     }
