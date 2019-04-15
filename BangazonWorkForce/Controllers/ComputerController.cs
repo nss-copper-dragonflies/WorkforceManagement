@@ -37,16 +37,11 @@ namespace BangazonWorkForce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-<<<<<<< HEAD
+
                     cmd.CommandText = @"select c.id, c.make, c.manufacturer, c.PurchaseDate, e.FirstName, e.LastName
                                         from Computer c
-                                        left join ComputerEmployee ce on ce.ComputerId = c.id
-                                        left join Employee e on ce.EmployeeId = e.Id";
-=======
-                        cmd.CommandText = @"SELECT id, Make, 
-                                                Manufacturer, purchaseDate
-                                            From Computer
-                                            WHERE 1 = 1";
+                                        inner join ComputerEmployee ce on ce.ComputerId = c.id
+                                        inner join Employee e on ce.EmployeeId = e.Id";
 
                     // In order to query the computer properties:
                     if (!string.IsNullOrWhiteSpace(searchString))
@@ -55,7 +50,7 @@ namespace BangazonWorkForce.Controllers
                                               Manufacturer LIKE @searchString)";
                         cmd.Parameters.Add(new SqlParameter("@searchString", $"%{searchString}%"));
                     }
->>>>>>> master
+
 
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Computer> computerList = new List<Computer>();

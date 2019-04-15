@@ -37,7 +37,6 @@
         </tr>
     </thead>
     <tbody>
-<<<<<<< HEAD
 @foreach (var item in Model) {
         <tr>
             <td>
@@ -58,26 +57,7 @@
             </td>
         </tr>
 }
-=======
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.id)
-                </td>
-                <td>
-                    @Html.ActionLink(item.Make, "Details", new { id = item.id })
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Manufacturer)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.purchaseDate)
-                </td>
 
-            </tr>
-        }
->>>>>>> master
     </tbody>
 </table>
 <a asp-action="Index">Clear Search</a>
