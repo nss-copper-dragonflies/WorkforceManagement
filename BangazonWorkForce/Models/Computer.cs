@@ -10,13 +10,17 @@ namespace BangazonWorkForce.Models
     {
         public int id { get; set; }
 
+        public string Make { get; set; }
+
+        public string Manufacturer { get; set; }    
         [Display(Name = "Purchase Date")]
         public DateTime purchaseDate { get; set; }
+
         public DateTime? DecommisionDate { get; set; }
-        public string Make { get; set; }
-        public string Manufacturer { get; set; }
 
         [Display(Name = "Employees")]
         public string employees { get; set; }
+
+        public Employee employeeObj { get; set; }
     }
 }

@@ -24,6 +24,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.purchaseDate)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.employeeObj.FullName)
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -33,7 +36,7 @@
                 @Html.DisplayFor(modelItem => item.id)
             </td>
             <td>
-                @Html.ActionLink(item.Make, "Details", new { id = item.id }) 
+                @Html.ActionLink(item.Make, "Details", new { id = item.id })
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Manufacturer)
@@ -41,7 +44,10 @@
             <td>
                 @Html.DisplayFor(modelItem => item.purchaseDate)
             </td>
-
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.employeeObj.FullName)
+            </td>
         </tr>
 }
     </tbody>

@@ -41,18 +41,29 @@ namespace BangazonWorkForce.Models.ViewModel
         }
         public Computer computer { get; set; }
         public List<Employee> Employees { get; set; }
+        public string employeeObj { get; set; }
 
         public List<SelectListItem> employeeOptions
         {
             get
             {
-                return Employees.Select(e => new SelectListItem
+                List<SelectListItem> employeeNameList =  Employees.Select(e => new SelectListItem
                 {
                     Value = e.Id.ToString(),
                     Text = $"{e.FirstName} {e.LastName}"
 
                 }).ToList();
+
+                employeeNameList.Insert(0, new SelectListItem
+                {
+                    Value = "0",
+                    Text = "No Employee",
+                    Selected = true
+                });
+
+                return employeeNameList;
             }
+        
         }
 
 

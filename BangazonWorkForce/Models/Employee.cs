@@ -10,15 +10,19 @@ namespace BangazonWorkForce.Models
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+
+        public string FullName
+        {
+            get
+            {
+                return $"{FirstName} {LastName}";
+            }
+        }
+
         public bool IsSupervisor { get; set; }
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
         public Computer Computer { get; set; } = new Computer();
-
-        public string FullName { get
-            {
-                return $"{FirstName} {LastName}";
-            } }
 
         public List<TrainingProgram> TrainingProgramList { get; set; }
     }
