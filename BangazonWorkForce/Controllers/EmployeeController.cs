@@ -252,7 +252,7 @@ namespace BangazonWorkForce.Controllers
                         
                     cmd.ExecuteNonQuery();
 
-                    if ((idcomputer.id != 0) && (idcomputer.id != viewModel.Employee.Computer.id))
+                    if ((idcomputer != null) && (idcomputer.id != viewModel.Employee.Computer.id))
                     {
                         cmd.CommandText = @"INSERT into ComputerEmployee(employeeId, computerId, assignDate)
                                             values(@id, @computerid, GETDATE());
@@ -264,7 +264,7 @@ namespace BangazonWorkForce.Controllers
                         cmd.Parameters.Add(new SqlParameter("@Oldid", idcomputer.ComputerEmployee.Id));
                         cmd.ExecuteNonQuery();
                     }
-                   else if(idcomputer.id == 0)
+                    else if(idcomputer == null)
                     {
                         cmd.CommandText = @"INSERT into ComputerEmployee(employeeId, computerId, assignDate)
                                             values(@id, @computerid, GETDATE());";
