@@ -30,26 +30,29 @@ namespace BangazonWorkForce.Controllers
         }
         // GET: Computer
         //Get method will return the list of computers makes and manufacturers
-        public ActionResult Index(string searchString)
+        public ActionResult Index(string q)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-
-                    cmd.CommandText = @"select c.id, c.make, c.manufacturer, c.PurchaseDate, e.FirstName, e.LastName
-                                        from Computer c
-                                        inner join ComputerEmployee ce on ce.ComputerId = c.id
-                                        inner join Employee e on ce.EmployeeId = e.Id";
-
-                    // In order to query the computer properties:
-                    if (!string.IsNullOrWhiteSpace(searchString))
+                    if (!string.IsNullOrWhiteSpace(q))
                     {
-                        cmd.CommandText += @" AND (Make LIKE @searchString OR
-                                              Manufacturer LIKE @searchString)";
-                        cmd.Parameters.Add(new SqlParameter("@searchString", $"%{searchString}%"));
+                        cmd.CommandText = @"SELECT c.Id, c.PurchaseDate, c.Make, c.Manufacturer, e.FirstName, e.LastName
+                                            FROM Computer c 
+                                            LEFT JOIN ComputerEmployee ce on ce.ComputerId = c.Id 
+                                            LEFT JOIN Employee e on e.id = ce.EmployeeId
+                                            WHERE c.Make LIKE @q OR c.Manufacturer LIKE @q";
                     }
+                    else
+                    {
+                        cmd.CommandText = @"SELECT c.Id, c.PurchaseDate, c.Make, c.Manufacturer, e.FirstName, e.LastName
+                                            FROM Computer c 
+                                            LEFT JOIN ComputerEmployee ce on ce.ComputerId = c.Id 
+                                            LEFT JOIN Employee e on e.id = ce.EmployeeId ";
+                    }
+                    cmd.Parameters.Add(new SqlParameter("@q", $"%{q}%"));
 
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -61,7 +64,7 @@ namespace BangazonWorkForce.Controllers
 
                             Computer computer = new Computer
                             {
-                                id = reader.GetInt32(reader.GetOrdinal("id")),
+                                id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Make = reader.GetString(reader.GetOrdinal("Make")),
                                 Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
                                 purchaseDate = reader.GetDateTime(reader.GetOrdinal("purchaseDate")),
