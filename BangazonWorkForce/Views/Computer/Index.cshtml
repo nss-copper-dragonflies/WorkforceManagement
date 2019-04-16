@@ -10,10 +10,14 @@
     <a asp-action="Create">Create New</a>
 </p>
 <form asp-controller="Computer" asp-action="Index">
-    <p>
-        Search: <input type="text" name="searchString" />
-        <input type="submit" value="Filter" />
-    </p>
+    <div class="navbar-left" style="margin-top:8px;">
+        @using (Html.BeginForm("Index", "Search", FormMethod.Get))
+        {
+            <ul class="nav navbar-nav">
+                <li>@Html.TextBox("q", ViewBag.CurrentFilter as string)<input type="submit" value="Search" /></li> 
+            </ul>
+        }
+    </div>
 </form>
 
 <table class="table">
@@ -31,27 +35,32 @@
             <th>
                 @Html.DisplayNameFor(model => model.purchaseDate)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.employeeObj.FullName)
+            </th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.id)
-                </td>
-                <td>
-                    @Html.ActionLink(item.Make, "Details", new { id = item.id })
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Manufacturer)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.purchaseDate)
-                </td>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.id)
+            </td>
+            <td>
+                @Html.ActionLink(item.Make, "Details", new { id = item.id })
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Manufacturer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.purchaseDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.employeeObj.FullName)
+            </td>
+        </tr>
+}
 
-            </tr>
-        }
     </tbody>
 </table>
 <a asp-action="Index">Clear Search</a>
