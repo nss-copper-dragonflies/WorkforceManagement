@@ -50,7 +50,7 @@ namespace BangazonWorkForce.Controllers
                         cmd.CommandText = @"SELECT c.Id, c.PurchaseDate, c.Make, c.Manufacturer, e.FirstName, e.LastName
                                             FROM Computer c 
                                             LEFT JOIN ComputerEmployee ce on ce.ComputerId = c.Id 
-                                            LEFT JOIN Employee e on e.id = ce.EmployeeId ";
+                                            LEFT JOIN Employee e on e.id = ce.EmployeeId "; 
                     }
                     cmd.Parameters.Add(new SqlParameter("@q", $"%{q}%"));
 
