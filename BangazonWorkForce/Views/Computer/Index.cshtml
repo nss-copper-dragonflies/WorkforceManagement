@@ -10,10 +10,14 @@
     <a asp-action="Create">Create New</a>
 </p>
 <form asp-controller="Computer" asp-action="Index">
-    <p>
-        Search: <input type="text" name="searchString" />
-        <input type="submit" value="Filter" />
-    </p>
+    <div class="navbar-left" style="margin-top:8px;">
+        @using (Html.BeginForm("Index", "Search", FormMethod.Get))
+        {
+            <ul class="nav navbar-nav">
+                <li>@Html.TextBox("q", ViewBag.CurrentFilter as string)<input type="submit" value="Search" /></li> 
+            </ul>
+        }
+    </div>
 </form>
 
 <table class="table">
