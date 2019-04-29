@@ -11,11 +11,11 @@ Bangazon Workforce Management enables HR to manage employees, departments and tr
 
 ### Employees
 ---
-##Ashwin Prakash
--User can see the list of employees and their department they belong too
--User can create an Employee with deaprtment info
--User can view details of an individual employee including assigned computer and training programs they have participated and signed up for
--user can edit all details of an employee including their computer and training programs
+###### Ashwin Prakash
+- User can see the list of employees and their department they belong too
+- User can create an Employee with deaprtment info
+- User can view details of an individual employee including assigned computer and training programs they have participated and signed up for
+- User can edit all details of an employee including their computer and training programs
 
 
 ### Departments
